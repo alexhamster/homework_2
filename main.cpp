@@ -8,50 +8,6 @@
 #include <functional>
 #include <fstream>
 
-
-/*
-void writeVectorToFile(std::ofstream& out_stream_, const std::vector<unsigned char> &vec_)
-{
-for (auto i = vec_.cbegin(); i != vec_.cend(); i++)
-{
-out_stream_ << +(*i);
-if (i != vec_.cend() - 1)
-out_stream_ << ".";
-}
-out_stream_ << std::endl;
-}
-
-void write2DVectorToFile(std::ofstream& out_stream_, const std::list<std::vector<unsigned char>> &list_)
-{
-for (auto ip = list_.cbegin(); ip != list_.cend(); ++ip)
-writeVectorToFile(out_stream_, *ip);
-}
-
-std::list<std::vector<unsigned char>>* readIpFile(std::string path_)
-{
-std::ifstream input_stream;
-input_stream.open(path_);
-if (!input_stream.is_open())
-throw std::exception("Can not open input file");
-
-auto* ip_pool = new std::list<std::vector<unsigned char>>;
-
-for (std::string line; std::getline(input_stream, line);)
-{
-auto t = split(split(line, '\t').at(0), '.');
-std::vector<unsigned char> c;
-
-for (auto i : t)
-c.push_back(std::stoi(i));
-
-ip_pool->push_back(c);
-}
-input_stream.close();
-return ip_pool;
-}
-
-*/
-
 std::vector<std::string> split(const std::string &str, char d)
 {
 	std::vector<std::string> r;
@@ -113,7 +69,6 @@ bool filterAny(const std::vector<unsigned char> &vec_, T t)
 	return false;
 }
 
-
 int main()
 {
 	try
@@ -135,14 +90,10 @@ int main()
 		}
 
 		//reverse lexicographically sort
-		//std::sort(ip_pool.begin(), ip_pool.end());
-
 		ip_pool.sort();
 		printIpPool(ip_pool);
 
 		//lexicographically sort
-		//std::sort(ip_pool.rbegin(), ip_pool.rend());
-
 		ip_pool.sort(std::greater<std::vector<unsigned char>>());
 		printIpPool(ip_pool);
 
