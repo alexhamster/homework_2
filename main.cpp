@@ -147,21 +147,21 @@ int main()
 		printIpPool(ip_pool);
 
 		// ip = filter(1)
-		for (auto& ip = ip_pool.cbegin(); ip != ip_pool.cend(); ++ip)
+		for (auto ip = ip_pool.cbegin(); ip != ip_pool.cend(); ++ip)
 		{
 			if (filter(*(ip->cbegin()), 1))
 				printVector(*ip);
 		}
 
 		// ip = filter(46, 70)
-		for (auto& ip = ip_pool.cbegin(); ip != ip_pool.cend(); ++ip)
+		for (auto ip = ip_pool.cbegin(); ip != ip_pool.cend(); ++ip)
 		{
 			if (filter(*(ip->cbegin()), 46, 70))
 				printVector(*ip);
 		}
 
 		// ip = filterAny(46)
-		for (auto& ip = ip_pool.cbegin(); ip != ip_pool.cend(); ++ip)
+		for (auto ip = ip_pool.cbegin(); ip != ip_pool.cend(); ++ip)
 		{
 			if (filterAny(*ip, 46))
 				printVector(*ip);
