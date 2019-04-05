@@ -8,121 +8,159 @@
 #include <functional>
 #include <fstream>
 
+using ip_vec = std::vector<unsigned char>;
+
+using ip_pool_list = std::list<std::vector<unsigned char>>;
+
 std::vector<std::string> split(const std::string &str, char d)
 {
-	std::vector<std::string> r;
+    std::vector<std::string> r;
 
-	std::string::size_type start = 0;
-	std::string::size_type stop = str.find_first_of(d);
-	while (stop != std::string::npos)
-	{
-		r.push_back(str.substr(start, stop - start));
+    std::string::size_type start = 0;
+    std::string::size_type stop = str.find_first_of(d);
+    while (stop != std::string::npos)
+    {
+        r.push_back(str.substr(start, stop - start));
 
-		start = stop + 1;
-		stop = str.find_first_of(d, start);
-	}
+        start = stop + 1;
+        stop = str.find_first_of(d, start);
+    }
 
-	r.push_back(str.substr(start));
+    r.push_back(str.substr(start));
 
-	return r;
+    return r;
 }
 
-void printVector(const std::vector<unsigned char> &vec_)
+void printVector(const ip_vec &vec_)
 {
-	for (auto i = vec_.cbegin(); i != vec_.cend(); i++)
-	{
-		std::cout << +(*i);
-		if (i != vec_.cend() - 1)
-			std::cout << ".";
-	}
-	std::cout << std::endl;
+    for (auto i = vec_.cbegin(); i != vec_.cend(); i++)
+    {
+        std::cout << +(*i);
+        if (i != vec_.cend() - 1)
+            std::cout << ".";
+    }
+    std::cout << std::endl;
 }
 
-void printIpPool(const std::list<std::vector<unsigned char>> &list_)
+void printIpPool(const ip_pool_list &list_)
 {
-	for (auto ip = list_.cbegin(); ip != list_.cend(); ++ip)
-		printVector(*ip);
+    for (auto ip : list_)
+        printVector(ip);
 }
 
 template<typename... Args>
 bool filter(const unsigned char &iter_, Args... args)
 {
-	unsigned char filters[sizeof...(args)] = { (static_cast<unsigned char>(args))... };
-	for (size_t i = 0; i < sizeof...(args); ++i)
-	{
-		auto it = std::next(&iter_, i);
-		if (*it != filters[i])
-			return false;
-	}
 
-	return true;
+
+    unsigned char filters[sizeof...(args)] = { (static_cast<unsigned char>(args))... };
+    for (size_t i = 0; i < sizeof...(args); ++i)
+    {
+        auto it = std::next(&iter_, i);
+        if (*it != filters[i])
+            return false;
+    }
+
+    return true;
 }
 
 template<typename T>
-bool filterAny(const std::vector<unsigned char> &vec_, T t)
+bool filterAny(const ip_vec &vec_, T t)
 {
-	for (auto i = vec_.cbegin(); i != vec_.cend(); ++i)
-	{
-		if (filter(*i, t))
-			return true;
-	}
-	return false;
+    for (auto i : vec_)
+    {
+        if (filter(i, t))
+            return true;
+    }
+    return false;
 }
+
+void filter_test()
+{
+    ip_vec t;
+    t.push_back(46);
+    t.push_back(70);
+    t.push_back(20);
+    t.push_back(0);
+
+    assert(filter(*(t.cbegin()), 46, 70, 20));
+    assert(!filter(*(t.cbegin()), 46, 24));
+    assert(!filter(*(t.cbegin()), 56, 70, 70, 0));
+}
+
+void filterAny_test()
+{
+    ip_vec t;
+    t.push_back(46);
+    t.push_back(70);
+    t.push_back(20);
+    t.push_back(0);
+
+    assert(filterAny(t, 46));
+    assert(filterAny(t, 0));
+    assert(!filterAny(t, 228));
+}
+
 
 int main()
 {
-	try
-	{
-		std::list<std::vector<unsigned char>> ip_pool;
 
-		for (std::string line; std::getline(std::cin, line);)
-		{
-			if (line.length() == 0)
-				break;
+    filter_test();
 
-			auto t = split(split(line, '\t').at(0), '.');
-			std::vector<unsigned char> c;
+    filterAny_test();
 
-			for (auto i : t)
-				c.push_back(std::stoi(i));
+    try
+    {
+        ip_pool_list ip_pool;
 
-			ip_pool.push_back(c);
-		}
+        for (std::string line; std::getline(std::cin, line);)
+        {
+            //if (line.length() == 0)
+            //   break;
 
-		//reverse lexicographically sort
-		ip_pool.sort();
-		printIpPool(ip_pool);
+            auto t = split(split(line, '\t').at(0), '.');
+            ip_vec c;
 
-		//lexicographically sort
-		ip_pool.sort(std::greater<std::vector<unsigned char>>());
-		printIpPool(ip_pool);
+            for (auto i : t)
+                c.push_back(std::stoi(i));
 
-		// ip = filter(1)
-		for (auto ip = ip_pool.cbegin(); ip != ip_pool.cend(); ++ip)
-		{
-			if (filter(*(ip->cbegin()), 1))
-				printVector(*ip);
-		}
+            ip_pool.push_back(c);
+        }
 
-		// ip = filter(46, 70)
-		for (auto ip = ip_pool.cbegin(); ip != ip_pool.cend(); ++ip)
-		{
-			if (filter(*(ip->cbegin()), 46, 70))
-				printVector(*ip);
-		}
+        //reverse lexicographically sort
+        ip_pool.sort();
+        printIpPool(ip_pool);
 
-		// ip = filterAny(46)
-		for (auto ip = ip_pool.cbegin(); ip != ip_pool.cend(); ++ip)
-		{
-			if (filterAny(*ip, 46))
-				printVector(*ip);
-		}
+        //lexicographically sort
+        ip_pool.sort(std::greater<ip_vec>());
+        printIpPool(ip_pool);
 
-	}
-	catch (const std::exception &e)
-	{
-		std::cerr << e.what() << std::endl;
-	}
+        // ip = filter(1)
+        for (auto ip : ip_pool)
+        {
+            if (filter(*(ip.cbegin()), 1))
+                printVector(ip);
+        }
 
-	return 0;
+        // ip = filter(46, 70)
+        for (auto ip : ip_pool)
+        {
+            if (filter(*(ip.cbegin()), 46, 70))
+                printVector(ip);
+        }
+
+        // ip = filterAny(46)
+        for (auto ip : ip_pool)
+        {
+            if (filterAny(ip, 46))
+                printVector(ip);
+        }
+
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << e.what() << std::endl;
+    }
+
+    return 0;
 }
