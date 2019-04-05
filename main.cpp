@@ -1,4 +1,3 @@
-#include <cassert>
 #include <cstdlib>
 #include <iostream>
 #include <string>
@@ -7,6 +6,7 @@
 #include <algorithm>
 #include <functional>
 #include <fstream>
+#include <cassert>
 
 using ip_vec = std::vector<unsigned char>;
 
@@ -44,7 +44,7 @@ void printVector(const ip_vec &vec_)
 
 void printIpPool(const ip_pool_list &list_)
 {
-    for (auto ip : list_)
+    for (auto& ip : list_)
         printVector(ip);
 }
 
@@ -115,13 +115,13 @@ int main()
 
         for (std::string line; std::getline(std::cin, line);)
         {
-            //if (line.length() == 0)
-            //   break;
+            if (line.length() == 0)
+               break;
 
             auto t = split(split(line, '\t').at(0), '.');
             ip_vec c;
 
-            for (auto i : t)
+            for (auto& i : t)
                 c.push_back(std::stoi(i));
 
             ip_pool.push_back(c);
@@ -136,21 +136,21 @@ int main()
         printIpPool(ip_pool);
 
         // ip = filter(1)
-        for (auto ip : ip_pool)
+        for (auto& ip : ip_pool)
         {
             if (filter(*(ip.cbegin()), 1))
                 printVector(ip);
         }
 
         // ip = filter(46, 70)
-        for (auto ip : ip_pool)
+        for (auto& ip : ip_pool)
         {
             if (filter(*(ip.cbegin()), 46, 70))
                 printVector(ip);
         }
 
         // ip = filterAny(46)
-        for (auto ip : ip_pool)
+        for (auto& ip : ip_pool)
         {
             if (filterAny(ip, 46))
                 printVector(ip);
