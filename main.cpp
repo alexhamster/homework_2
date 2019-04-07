@@ -42,10 +42,14 @@ void printVector(const ip_vec &vec_)
     std::cout << std::endl;
 }
 
-void printIpPool(const ip_pool_list &list_)
+void printIpPool(const ip_pool_list &list_, bool reversed = false)
 {
-    for (auto& ip : list_)
-        printVector(ip);
+    if(reversed)
+        for (auto ip = list_.crbegin(); ip != list_.crend(); ip++)
+            printVector(*ip);
+    else
+        for (auto ip = list_.cbegin(); ip != list_.cend(); ip++)
+            printVector(*ip);
 }
 
 template<typename... Args>
@@ -129,28 +133,27 @@ int main()
 
         //reverse lexicographically sort
         ip_pool.sort();
-        printIpPool(ip_pool);
+        printIpPool(ip_pool, true);
 
         //lexicographically sort
-        ip_pool.sort(std::greater<ip_vec>());
-        printIpPool(ip_pool);
+        printIpPool(ip_pool, false);
 
         // ip = filter(1)
-        for (auto& ip : ip_pool)
+        for (auto ip : ip_pool)
         {
             if (filter(*(ip.cbegin()), 1))
                 printVector(ip);
         }
 
         // ip = filter(46, 70)
-        for (auto& ip : ip_pool)
+        for (auto ip : ip_pool)
         {
             if (filter(*(ip.cbegin()), 46, 70))
                 printVector(ip);
         }
 
         // ip = filterAny(46)
-        for (auto& ip : ip_pool)
+        for (auto ip : ip_pool)
         {
             if (filterAny(ip, 46))
                 printVector(ip);
