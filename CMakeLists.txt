@@ -8,7 +8,7 @@ add_executable(ip_filter main.cpp)
 
 add_library(ip_lib filter.cpp)
 
-add_executable(ip_filter_test ip_filter_test.cpp)
+add_executable(ip_filter_test test_ip_filter.cpp)
 
 set_target_properties(ip_filter ip_lib ip_filter_test PROPERTIES
     CXX_STANDARD 17
