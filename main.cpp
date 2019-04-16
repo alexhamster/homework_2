@@ -20,11 +20,7 @@ int main()
             ip_pool.push_back(c);
         }
 
-        //reverse lexicographically sort
-        ip_pool.sort();
-        printIpPool(ip_pool);
-
-        //lexicographically sort
+        //revers lexicographically sort
         ip_pool.sort(std::greater<ip_vec>());
         printIpPool(ip_pool);
 
